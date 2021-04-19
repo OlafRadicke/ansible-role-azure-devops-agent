@@ -175,6 +175,19 @@
   when:
     - az_devops_agent_role == 'resource'
     - (not service_is_installed) or reconfigure_or_replace
+    - az_platform_type != "Debian-armv7l"
+
+- name: Configure agent as an environment resource with sudo
+  command: "AGENT_ALLOW_RUNASROOT=1 {{ (agent_cmd_args + resource_agent_cmd_args) | join(' ') }}"
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+    creates: "{{ az_devops_agent_folder }}/.agent"
+  become: true
+  become_user: "{{ az_devops_agent_user }}"
+  when:
+    - az_devops_agent_role == 'resource'
+    - (not service_is_installed) or reconfigure_or_replace
+    - az_platform_type == "Debian-armv7l"
 
 - name: Set provided user defined capabilities
   ini_file:
